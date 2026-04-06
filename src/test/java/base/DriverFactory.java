@@ -14,7 +14,7 @@ public class DriverFactory {
         try {
             ChromeOptions options = new ChromeOptions();
             driver.set(new RemoteWebDriver(
-                    new URL("http://172.31.26.62:4444/wd/hub"),
+                    new URL("http://localhost:4444/wd/hub"),
                     options
             ));
         } catch (Exception e) {
