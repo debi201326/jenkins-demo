@@ -1,33 +1,57 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'Maven'
+    }
+
+    environment {
+        MAVEN_OPTS = '-Dmaven.test.failure.ignore=true'
+    }
+
     stages {
+
         stage('Checkout') {
             steps {
-                git 'https://github.com/debi201326/jenkins-demo.git'
+                git branch: 'main', url: 'https://github.com/debi201326/jenkins-demo.git'
             }
         }
 
-        stage('Build') {
+        stage('Build & Test') {
             steps {
-                bat 'mvn clean compile'
+                bat 'mvn clean test'
             }
         }
 
-        stage('Test') {
+        stage('Archive Results') {
             steps {
-                bat 'mvn test'
+                junit 'target/surefire-reports/*.xml'
             }
         }
 
-        stage('Report') {
+        stage('Publish Report') {
             steps {
                 publishHTML([
                     reportDir: 'reports',
                     reportFiles: 'extent-report.html',
-                    reportName: 'Test Report'
+                    reportName: 'Extent Report',
+                    keepAll: true,
+                    alwaysLinkToLastBuild: true,
+                    allowMissing: true
                 ])
             }
+        }
+    }
+
+    post {
+        always {
+            echo 'Build Finished'
+        }
+        success {
+            echo 'Build Passed'
+        }
+        failure {
+            echo 'Build Failed'
         }
     }
 }
